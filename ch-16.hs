@@ -1,0 +1,128 @@
+--6
+-- countleaf (Leaf) = 1
+-- countleaf (Node t1 t2) = countleaf t1 + t2
+
+-- countnode (Leaf _ ) = 0
+-- countnode (Node t1 t2) = 1 + countnode t1 + codenote t2
+
+--Base case:
+-- countleaf t - countnode t = 1
+-- countleaf (Leaf _) - countnode (Leaf _)
+--  = 1 - 0 = 1
+
+-- Induction:
+-- countleaf (Node l r) - countnode (Node l r)
+-- = (countleaf l + countleaf r) - (1 + countnode l + countleaf r)
+-- = (countleaf l + countleaf r) - 1 - countnode l - countnode r
+-- = countleaf l + countleaf r - 1 - countnode l - countnode r
+-- -> IH = 1 + 1 - 1 = 2 - 1 = 1
+
+--7
+-- fmap _ Nothing = Nothing
+-- fmap g (Just x) = Just (g x)
+--
+-- Cases:
+-- fmap id Nothing = Nothing
+-- fmap id (Just x) = Just (id x) = Just x
+--
+-- fmap (g . h) Nothing = Nothing
+--                      = fmap h Nothing
+--                      = fmap g . fmap h Nothing
+--
+-- fmap (g . h) (Just x) = Just ((g . h) x)
+--                       = Just (g . h x)
+--                       = fmap g (Just (h x))
+--                       = fmap g (fmap h (Just x))
+--                       = fmap g . fmap h (Just x)
+
+--8
+-- id law:
+-- fmap id (Leaf a) = Leaf (id x)
+--                  = Leaf x
+--                  = id (Leaf x)
+-- fmap id (Node l r)
+--      = Node (fmap id l) (fmap id r)
+--      = Node (id l) (id r)
+--      = Node l r
+--      = id (Node l r)
+--
+-- (g . h) law:
+-- fmap (g . h) (Leaf a) = Leaf (g . h x)
+--                       = fmap g (Leaf (h x))
+--                       = (fmap g . fmap h) x
+-- fmap (g . h) (Node l r) = Node (fmap (g . h) l) (fmap (g . h) r)
+--                         = Node ((fmap g . fmap h) l) ((fmap g . fmap h) r)
+--                         = Node (fmap g (fmap h l)) (fmap g (fmap h r))
+--                         = fmap g (Node (fmap h l) (fmap h r))
+--                         = (fmap g . fmap h) Node l r
+--9
+-- instance Applicative Maybe where
+--   pure = Just
+--   Nothing <*> _ = Nothing
+--   (Just g) <*> mx = fmap g mx
+--
+-- Law 1:
+--    pure id <*> Nothing = Just id <*> Nothing
+--                        = fmap id Nothing
+--                        = id Nothing
+--                        = Nothing
+--    pure id <*> (Just g) = Just id <*> (Just g)
+--                         = fmap id (Just g)
+--                         = Just (id g)
+--                         = Just g
+-- Law 2:
+--    pure g <*> pure x = Just g <*> Just x
+--                      = fmap g (Just x)
+--                      = Just (g x )
+--                      = pure (g x)
+--
+-- Law 3:
+--    Nothing <*> pure y = Nothing <*> Just y
+--                       = Nothing
+--                       = (\g -> g y) <*> Nothing
+--                       = pure (\g -> g y) <*> Nothing
+--    Just x <*> pure y = Just x <*> Just y
+--                      = fmap x (Just y)
+--                      = Just (x y)
+--                      = Just (\g -> g y) <*> x
+--                      = pure (\g -> g y) <*> x
+--
+-- Law 4:
+--    (pure (.) <*> x <*> y) <*> Nothing = (Just (.) <*> x <*> y) <*> Nothing
+--                                 = ((fmap (.) x) <*> y) <*> Nothing
+--                                 = x . y Nothing
+--                                 = x <*> (y <*> Nothing)
+--
+--    (pure (.) <*> x <*> y) <*> Just x = (Just (.) <*> x <*> y) <*> Just x
+--                                 = ((fmap (.) x) <*> y) <*> Just x
+--                                 = x . y Just x
+--                                 = x <*> (y <*> Just x)
+
+--10
+-- Proof by cases:
+--
+-- Law 1: return [] >>= f = pure [] >>= f
+--                        = f []
+--        return (x:xs) >>= f = pure (x:xs) >>= f
+--                            = f (x:xs)
+--
+-- Law 2: [] >>= return = return []
+--        (x:xs) >>= return = return (x:xs)
+--
+-- Law 3: ([] >>= f) >>= g = (f []) >>= g = g (f [])
+--        ((x:xs) >>= f) >>= g = (f (x:xs)) >>= g = g (f (x:xs))
+
+--11
+-- comp' e c = comp e ++ c
+--
+-- comp' :: Expr -> Code -> Code
+-- comp' (Val n) c = PUSH n : c
+-- comp' (Add x y) c = comp' x (comp' y (ADD : c))
+--
+-- comp' (Val n) c = [PUSH n] ++ c = Push n : c
+-- comp' (Add x y) c = comp x ++ comp y ++ [ADD] ++ c
+--                   = comp x ++ comp y ++ ([ADD] ++ c)
+--                   = comp x ++ comp y ++ (ADD : c)
+--                   = comp x ++ (comp y ++ (ADD : c))
+--                   = comp x ++ comp' y (ADD : c)
+--                   = comp' x (comp' y (ADD : c))
