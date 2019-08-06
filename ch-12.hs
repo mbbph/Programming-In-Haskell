@@ -17,15 +17,35 @@ instance Functor ZipList where
 
 instance Applicative ZipList where
   pure x = Z (repeat x)
-  (Z gs) <*> (Z xs) = Z [g x | (g, x) <- zip gs xs]
+  (Z gs) <*> (Z xs) = Z [g x | (g,x) <- zip gs xs]
 
---5  Not too sure how to answer this, but here are my thoughts: 
-  --a. x is some container object
-  --b. x is some container object
-  --c. y is a function that takes another function
-  --   x is the function applied to y
-  --   g is the placeholder for x
-  --4. z is some container object, and x and y have types (b -> c) and (a -> b) 
+--5  not sure how to answer this but here are my thoughts...
+--1.
+--   x is some container object
+--   left to right derivation :
+--   pure id <*> x
+--   (pure id) <*> x
+--   pure (id x)
+--   pure x
+--   x (??)  /really not sure how pure disappears
+--2. x is some container object?
+--   right to left derivation :
+--   pure g <*> pure x
+--   (pure g) <*> pure x
+--   pure (g (pure x))
+--   pure (g x)   /don't know how pure disappears
+--3.
+--   y is a function that takes another function
+--   x is the function applied to y
+--   g is the placeholder for x...
+--4. z is some container (???) object, and x and y have types (b -> c) and (a -> b) ??
+--   right to left derivation :
+--   (pure (.) <*> x <*> y) <*> z
+--   ((pure (.)) <*> x <*> y) <*> z
+--   (pure (x .) <*> y) <*> z
+--   (pure (x . y) <*> z)
+--   pure (x . y z)
+--   x <*> (y <*> z)  /again, don't really understand how pure disappears
 
 --6
 instance Monad ((->) a) where

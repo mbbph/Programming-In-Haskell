@@ -107,8 +107,8 @@ calc xs = do display xs
 eval :: String -> IO ()
 eval xs = case parse expr xs of
              [(n, [])] -> calc (show n)
-             [(_, nx)]  -> do errorpos nx
-                              calc xs
+             [(_, (n:nx))]  -> do errorpos nx
+                                  calc xs
 
 beep :: IO ()
 beep = putStr "\BEL"
