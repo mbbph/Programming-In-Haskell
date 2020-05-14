@@ -1,2 +1,2 @@
-# Haskell-Asst
+Answers to chapter questions
 
